@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    The simulation: plain .NET, no Godot references (see CLAUDE.md, Architecture rules).
+    Target net8.0 to match the Godot 4.7 project that references it.
+  -->
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <AssemblyName>Footprint.Sim</AssemblyName>
+    <RootNamespace>Footprint.Sim</RootNamespace>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <!-- Godot exports build referenced projects with its own configuration names. -->
+  <PropertyGroup Condition="'$(Configuration)' == 'ExportRelease'">
+    <Optimize>true</Optimize>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Footprint.Sim.Tests" />
+  </ItemGroup>
+
+</Project>

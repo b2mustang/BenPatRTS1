@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-test:
+    name: Build and test
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      # LFS files (art, audio) are not needed to build or test, so they are not downloaded.
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+
+      - name: Restore
+        run: dotnet restore Footprint.sln
+
+      # Builds the sim, its tests and the Godot C# project (Godot.NET.Sdk comes from NuGet).
+      - name: Build
+        run: dotnet build Footprint.sln --no-restore
+
+      - name: Test
+        run: dotnet test Footprint.sln --no-build --logger "console;verbosity=normal"

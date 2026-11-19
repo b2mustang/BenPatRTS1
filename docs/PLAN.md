@@ -197,8 +197,8 @@ Current as of November 2026; confirm each figure in your Steamworks account.
 
 1. Name the mission targets (`STORY.md` §11).
 2. Run the paper prototype.
-3. Install Godot 4.7.2 (.NET edition) and the .NET SDK version its documentation lists.
-4. Start M0.
+3. Finish M0: the scaffold builds, its tests pass and the Godot smoke test passes locally. Push it and confirm the CI run is green.
+4. Start M1: the plain digital prototype of one side contract, built on what the paper prototype shows.
 
 ## Sources
 
