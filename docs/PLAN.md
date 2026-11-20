@@ -196,9 +196,8 @@ Current as of November 2026; confirm each figure in your Steamworks account.
 ## 10. Next steps
 
 1. Name the mission targets (`STORY.md` §11).
-2. Run the paper prototype.
-3. Finish M0: the scaffold builds, its tests pass and the Godot smoke test passes locally. Push it and confirm the CI run is green.
-4. Start M1: the plain digital prototype of one side contract, built on what the paper prototype shows.
+2. Run the paper prototype ([`prototype/paper-prototype.html`](prototype/paper-prototype.html), now v0.2): session 1 on v0.1 is in [`prototype/playtest-log.md`](prototype/playtest-log.md). Play 2–4 more contracts on v0.2 and log them.
+3. Start M1: the plain digital prototype of one side contract, built on what the paper prototype shows. (M0 is done: scaffold, tests, Godot smoke test and green CI.)
 
 ## Sources
 

@@ -1,0 +1,723 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Footprint Paper Prototype</title>
+<style>
+  :root {
+    --bg: #f4f2ec;
+    --paper: #ffffff;
+    --ink: #1d1d1f;
+    --muted: #5b5b63;
+    --line: #c9c6bd;
+    --soft: #efece4;
+    --digital: #2f6fdb;
+    --physical: #c96a1e;
+    --social: #8a4fd1;
+    --money: #2e8b57;
+    --final: #c93636;
+    --accent: #0f766e;
+    --ok: #2e7d32;
+    --bad: #b3261e;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #121316; --paper: #1b1d22; --ink: #ececf1; --muted: #a1a1aa;
+      --line: #3a3d45; --soft: #24262c;
+      --digital: #6e9ef0; --physical: #e8944f; --social: #b48aec; --money: #5cc28a; --final: #ef6b6b; --accent: #3fb6aa;
+      --ok: #6cc070; --bad: #f08a80;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #121316; --paper: #1b1d22; --ink: #ececf1; --muted: #a1a1aa;
+    --line: #3a3d45; --soft: #24262c;
+    --digital: #6e9ef0; --physical: #e8944f; --social: #b48aec; --money: #5cc28a; --final: #ef6b6b; --accent: #3fb6aa;
+    --ok: #6cc070; --bad: #f08a80;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font: 15px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  main { max-width: 1040px; margin: 0 auto; padding: 24px 16px 64px; }
+  h1 { font-size: 28px; margin: 0 0 4px; letter-spacing: -0.01em; }
+  h2 { font-size: 20px; margin: 36px 0 10px; padding-bottom: 6px; border-bottom: 2px solid var(--ink); }
+  h3 { font-size: 16px; margin: 18px 0 8px; }
+  p, li { max-width: 72ch; }
+  .sub { color: var(--muted); margin: 0 0 16px; }
+  .panel { background: var(--paper); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; }
+  .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; }
+  table { border-collapse: collapse; width: 100%; background: var(--paper); }
+  th, td { border: 1px solid var(--line); padding: 6px 8px; text-align: left; vertical-align: top; font-size: 14px; }
+  th { background: var(--soft); }
+  .contract { border-left: 6px solid var(--final); }
+  .contract h3 { margin-top: 0; }
+  .guide { border-left: 6px solid var(--accent); }
+  .guide h3 { margin-top: 0; }
+  ol.steps > li { margin-bottom: 8px; }
+  .kbd { font-weight: 600; }
+  dl.words { display: grid; grid-template-columns: 150px 1fr; gap: 6px 12px; margin: 0; }
+  dl.words dt { font-weight: 600; }
+  dl.words dd { margin: 0; }
+
+  /* Tracks */
+  .track { margin: 10px 0 16px; }
+  .track-label { font-weight: 600; margin-bottom: 4px; display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+  .track-label span { font-weight: 400; color: var(--muted); font-size: 13px; }
+  .boxes { display: flex; flex-wrap: wrap; gap: 4px; }
+  .box {
+    min-width: 40px; height: 40px; border: 1.5px solid var(--ink); border-radius: 6px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    font-size: 12px; line-height: 1.1; text-align: center; padding: 2px 4px; background: var(--paper);
+  }
+  .box small { font-size: 10px; color: var(--muted); }
+  .box.lvl-elev { background: color-mix(in srgb, var(--physical) 14%, var(--paper)); }
+  .box.lvl-inv { background: color-mix(in srgb, var(--physical) 30%, var(--paper)); }
+  .box.lvl-ir { background: color-mix(in srgb, var(--final) 30%, var(--paper)); }
+  .box.end { background: var(--final); color: #fff; border-color: var(--final); font-weight: 700; }
+  .slots { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; }
+  .slot { border: 1.5px dashed var(--ink); border-radius: 8px; height: 72px; padding: 6px 8px; font-size: 12px; color: var(--muted); }
+  .checks { display: flex; flex-wrap: wrap; gap: 6px 18px; }
+  .checks label { display: inline-flex; align-items: center; gap: 6px; }
+  .cb { width: 16px; height: 16px; border: 1.5px solid var(--ink); border-radius: 3px; display: inline-block; }
+  .write { border-bottom: 1.5px solid var(--ink); display: inline-block; min-width: 120px; height: 18px; }
+
+  /* Clock: one row per day, six parts per day */
+  .clock { display: grid; grid-template-columns: 56px repeat(6, minmax(0, 1fr)); gap: 4px; }
+  .clock .head { font-size: 11px; color: var(--muted); text-align: center; line-height: 1.2; }
+  .clock .day-label { font-weight: 700; display: flex; align-items: center; }
+  .clock .cell {
+    border: 1.5px solid var(--ink); border-radius: 6px; height: 44px; padding: 3px 4px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    font-size: 15px; font-weight: 600; background: var(--paper);
+  }
+  .clock .cell small { font-size: 10px; font-weight: 400; color: var(--muted); }
+  .clock .cell.day { background: color-mix(in srgb, #f2c94c 30%, var(--paper)); }
+  .clock .cell.night { background: color-mix(in srgb, var(--digital) 18%, var(--paper)); }
+  .clock .cell.off { border-style: dashed; color: var(--muted); background: transparent; font-weight: 400; font-size: 11px; }
+  .clock .cell.last { border-color: var(--final); border-width: 2.5px; }
+  .tod td:first-child { white-space: nowrap; }
+  .sun { color: #b8860b; }
+  .moon { color: var(--digital); }
+
+  /* Maps */
+  .map { display: grid; gap: 10px; }
+  .layer { display: grid; grid-template-columns: 130px 1fr; gap: 10px; align-items: center; }
+  .layer-name { font-weight: 600; font-size: 13px; color: var(--muted); }
+  .nodes { display: flex; flex-wrap: wrap; gap: 8px; }
+  .node { border: 1.5px solid var(--ink); border-radius: 8px; padding: 6px 10px; font-size: 13px; background: var(--paper); }
+  .node.hidden { border-style: dashed; color: var(--muted); }
+  .node.goal { border-color: var(--final); border-width: 2.5px; font-weight: 700; }
+  .arrow { text-align: center; color: var(--muted); font-size: 13px; }
+  .city { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+
+  /* Cards */
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; }
+  .card {
+    background: var(--paper); border: 1.5px solid var(--ink); border-radius: 10px; padding: 10px 11px;
+    break-inside: avoid; page-break-inside: avoid; position: relative; border-top: 7px solid var(--c);
+  }
+  .card.digital { --c: var(--digital); }
+  .card.physical { --c: var(--physical); }
+  .card.social { --c: var(--social); }
+  .card.money { --c: var(--money); }
+  .card.final { --c: var(--final); }
+  .card-head { display: flex; justify-content: space-between; gap: 6px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); }
+  .badge { color: var(--c); font-weight: 700; }
+  .card h4 { margin: 4px 0 4px; font-size: 16px; }
+  .what { margin: 0 0 6px; font-size: 12.5px; font-style: italic; color: var(--muted); }
+  .card dl { display: grid; grid-template-columns: 58px 1fr; gap: 2px 6px; margin: 0 0 6px; font-size: 12.5px; }
+  .card dt { color: var(--muted); }
+  .card dd { margin: 0; }
+  .out { margin: 0; font-size: 13px; padding-top: 4px; }
+  .out.ok { border-top: 1px solid var(--line); padding-top: 6px; }
+  .out .mark { font-weight: 700; }
+  .out.ok .mark { color: var(--ok); }
+  .out.bad .mark { color: var(--bad); }
+  .legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; margin-bottom: 10px; }
+  .legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 5px; vertical-align: -1px; }
+
+  .note { color: var(--muted); font-size: 13px; }
+  .page-break { break-before: page; page-break-before: always; }
+
+  @media (max-width: 560px) {
+    .layer { grid-template-columns: 1fr; }
+    .box { min-width: 34px; height: 36px; }
+    dl.words { grid-template-columns: 1fr; gap: 2px; }
+    dl.words dd { margin-bottom: 8px; }
+    .clock { grid-template-columns: 34px repeat(6, minmax(0, 1fr)); gap: 3px; }
+    .clock .day-label { font-size: 11px; white-space: nowrap; }
+    .clock .cell { height: 40px; font-size: 13px; }
+    .clock .cell small, .clock .head { font-size: 9px; }
+  }
+  @media print {
+    :root {
+      --bg: #fff; --paper: #fff; --ink: #000; --muted: #444; --line: #999; --soft: #eee;
+    }
+    body { font-size: 12px; background: #fff; }
+    main { max-width: none; padding: 0; }
+    h2 { margin-top: 0; }
+    .cards { grid-template-columns: repeat(3, 1fr); }
+    .no-print { display: none; }
+    @page { size: letter; margin: 0.45in; }
+  }
+</style>
+</head>
+<body>
+<main>
+
+<h1>Footprint: Paper Prototype</h1>
+<p class="sub">Version 0.2 · one side contract, solo · tests the core loop before any code</p>
+
+<div class="grid2">
+  <div class="panel">
+    <h3 style="margin-top:0">What you need</h3>
+    <ul>
+      <li>This page, printed. Cut out the operation cards (they print three per row).</li>
+      <li>A pencil and a few coins or tokens.</li>
+      <li>A 10-sided die, or any dice app. A "0" on a d10 counts as 10.</li>
+      <li>About 30–45 minutes per contract.</li>
+    </ul>
+  </div>
+  <div class="panel contract">
+    <h3>Contract: Corrigan Freight</h3>
+    <p><b>Steal the client ledger</b> from Corrigan Freight's billing server before the end of <b>Day 3</b>.</p>
+    <p><b>Payout:</b> $3,000. <b>You lose if</b> Target Alert reaches 12 (lockdown), Heat reaches 10 (raid) or time runs out.</p>
+  </div>
+</div>
+
+<div class="panel" style="margin-top:14px">
+  <h3 style="margin-top:0">New in 0.2</h3>
+  <ul>
+    <li><b>Time is shown as parts of a day.</b> Each turn is one 4-hour part of the day, and the clock shows every day with the same six parts. Card times are in hours.</li>
+    <li><b>Every card says what the action is</b> in plain language, and shows what happens on success and on failure.</li>
+    <li><b>Words to know</b> and <b>your first turn</b> explain the keys, the tracks and running operations side by side.</li>
+    <li><b>Gear matters more:</b> Spear-Phish needs a Lookalike domain, and two new items improve phone calls and in-person work.</li>
+    <li><b>Lying low works better:</b> Target Alert drops by 2, not 1, in a turn with no Noise.</li>
+    <li>The rulings from the first playtest are now part of the rules.</li>
+  </ul>
+</div>
+
+<h2>Words to know</h2>
+<div class="panel">
+  <dl class="words">
+    <dt>Foothold</dt><dd>Your first machine or account inside Corrigan's network. Almost everything else needs it.</dd>
+    <dt>Admin credentials</dt><dd>An administrator's login, which opens most doors inside the network.</dd>
+    <dt>Route</dt><dd>A path into the billing network, which is walled off from the normal office network.</dd>
+    <dt>MFA bypass</dt><dd>A way past the second login step: the phone prompt or code that staff use after their password.</dd>
+    <dt>Intel</dt><dd>What you've learned about the target. Spend it to improve a roll.</dd>
+    <dt>Noise → Target Alert</dt><dd>Noise is anything their security team might notice. It raises Target Alert: how suspicious Corrigan is right now.</dd>
+    <dt>Trail</dt><dd>Evidence that leads back to you. When Corrigan investigates, Trail turns into Heat and helps them find your Foothold.</dd>
+    <dt>Heat</dt><dd>How close the police are to you personally. It never goes down during a contract.</dd>
+    <dt>Laptop and Body slots</dt><dd>Your hands. Two Laptop slots run digital and remote work; the Body slot is you, physically somewhere. All three can run at the same time.</dd>
+  </dl>
+</div>
+
+<h2>Setup</h2>
+<ul>
+  <li>The clock starts at <b>Day 1, Morning</b> (turn 1). You are at your <b>Desk</b>.</li>
+  <li><b>Cash $1,000</b>. Intel 0, Heat 0, Target Alert 0, Trail 0.</li>
+  <li><b>Slots:</b> 2 Laptop slots and 1 Body slot.</li>
+  <li><b>Known nodes:</b> the Website and Staff email. Everything else on the network map is hidden until revealed.</li>
+</ul>
+
+<h2>Time: parts of the day</h2>
+<p>Each turn is one <b>part of the day</b>: 4 in-game hours. Every day has the same six parts. When you do something matters, because offices, phones and guards follow the clock.</p>
+<table class="tod">
+  <tr><th>Part of the day</th><th>Hours</th><th>What's open</th></tr>
+  <tr><td>Night <span class="moon">☾</span></td><td>midnight–4 am</td><td>Night work: Dumpster Dive, Server Room After Hours.</td></tr>
+  <tr><td>Dawn <span class="moon">☾</span></td><td>4–8 am</td><td>Night work.</td></tr>
+  <tr><td>Morning <span class="sun">☀</span></td><td>8 am–noon</td><td>Business hours: staff are at their desks. Phone calls, phishing, push prompts, the lobby.</td></tr>
+  <tr><td>Afternoon <span class="sun">☀</span></td><td>noon–4 pm</td><td>Business hours.</td></tr>
+  <tr><td>Evening</td><td>4–8 pm</td><td>Staff are leaving. Neither business hours nor night: only operations with no time need.</td></tr>
+  <tr><td>Late <span class="moon">☾</span></td><td>8 pm–midnight</td><td>Night work.</td></tr>
+</table>
+<p class="note">Operations with no ☀ or ☾ on their card can start at any time. Time needs are checked only when an operation starts.</p>
+
+<h2>How a turn works</h2>
+<p>Each turn, do these steps in order:</p>
+<ol class="steps">
+  <li><span class="kbd">Shop and move.</span>
+    <ul>
+      <li>Buy gear from the shop. It's yours immediately.</li>
+      <li><b>Travel</b> between your Desk and the Café or HQ: put "Travel" in your Body slot. It takes this whole turn, and you arrive at the end of it.</li>
+      <li><b>Walk</b> between the Café and HQ: they're next door, so this is free and doesn't use your Body slot.</li>
+    </ul>
+  </li>
+  <li><span class="kbd">Start operations.</span> Place cards in free slots and pay their cost.
+    <ul>
+      <li><b>Laptop</b> operations need a Laptop slot, and you must be at your Desk or the Café, either before or after your walk this turn.</li>
+      <li><b>Body</b> operations need your Body slot, and you must be at the place shown after moving. While a Body operation runs, you stay where it is.</li>
+      <li>Check the card's <b>Needs</b>, including <span class="sun">☀</span> business hours or <span class="moon">☾</span> night. Needs are checked only when you start. A running Laptop operation keeps going wherever you go.</li>
+      <li>You may <b>cancel</b> a running operation: no refund, no Noise, and its slot frees up.</li>
+    </ul>
+  </li>
+  <li><span class="kbd">Run.</span> Every running operation counts down 4 hours, including ones you started this turn: a 4-hour operation resolves at the end of the turn you start it. Resolve finished operations one at a time, in the order you choose:
+    <ul>
+      <li><b>Spend Intel</b> if you want: <b>+10% per point, up to +30%</b>. Decide before you roll. Spent Intel is gone.</li>
+      <li>Apply any <b>Alert penalty</b> from the table below, using Target Alert as it was at the start of this step.</li>
+      <li><b>Roll the d10.</b> Success if the roll is at or under the chance ÷ 10 (40% succeeds on 1–4).</li>
+      <li>Apply the card's <span style="color:var(--ok)">✓</span> or <span style="color:var(--bad)">✗</span> line: its effect, its <b>Noise</b> (added to Target Alert), its <b>Trail</b> and any <b>Heat</b>.</li>
+      <li><b>Keys don't stack:</b> winning a key you already hold gives nothing, but its Noise and Trail still count.</li>
+      <li><b>Recon pays once:</b> a recon card gives its Intel and reveal only the first time it succeeds.</li>
+    </ul>
+  </li>
+  <li><span class="kbd">Defenders.</span> Apply the Target Alert table below. Then, if no Noise was added this turn, <b>lower Target Alert by 2</b> (not below 0).</li>
+  <li><span class="kbd">Clock.</span> Mark the next part of the day. After Day 3, Late (turn 16), the contract fails.</li>
+</ol>
+
+<div class="panel guide">
+  <h3>Your first turn: three things at once</h3>
+  <p>You have three "hands": two Laptop slots and your Body slot. They all work at the same time, so a strong turn keeps all three busy.</p>
+  <p>For example, on Day 1 Morning at your Desk:</p>
+  <ul>
+    <li><b>Laptop 1:</b> OSINT Sweep, reading up on the company's staff (4 hours).</li>
+    <li><b>Laptop 2:</b> Perimeter Scan, mapping their internet-facing systems (4 hours).</li>
+    <li><b>Body:</b> Travel to the Café, closer to HQ (takes the turn).</li>
+  </ul>
+  <p>At the end of the turn both scans resolve and you've arrived at the Café, ready for business-hours work next to HQ. Longer operations keep running in their slot while you start others around them.</p>
+</div>
+
+<h3>The four keys</h3>
+<p>Exfiltrating the ledger needs all four: a <b>Foothold</b>, <b>Admin credentials</b>, a <b>Route</b> and an <b>MFA bypass</b>. Each key can be earned more than one way: digital, physical or social.</p>
+
+<h2>Target Alert and Heat</h2>
+<table>
+  <tr><th style="width:90px">Alert</th><th style="width:150px">Level</th><th>Each turn, during the Defenders step</th></tr>
+  <tr><td>0–2</td><td>Normal</td><td>Nothing happens.</td></tr>
+  <tr><td>3–5</td><td>Elevated</td><td>Your Laptop operations get −10%.</td></tr>
+  <tr><td>6–8</td><td>Investigating</td><td>Laptop operations −10%. <b>Trace:</b> +1 Heat for every full 3 Trail. <b>Hunt:</b> if you have a Foothold and Trail is 2 or more, roll the d10: on 1–3 you lose the Foothold (if you have an Implant, lose the Implant instead). Running operations that need the Foothold are cancelled.</td></tr>
+  <tr><td>9–11</td><td>Incident response</td><td><b>The first time you reach this level:</b> credentials are reset (lose Admin credentials and MFA bypass) and the VPN is patched (Exploit the VPN no longer works). <b>Every turn:</b> Laptop operations −20%, Trace as above, and Hunt on 1–5.</td></tr>
+  <tr><td>12</td><td>Lockdown</td><td><b>Contract failed.</b></td></tr>
+</table>
+<p class="note"><b>Heat</b> never drops during a contract. At 10, police raid you and the contract fails, unless you hired the Lawyer. <b>Lying low</b> (a turn with no Noise) lowers Target Alert by 2, but while Alert is 6 or more, Trace and Hunt still happen every turn.</p>
+
+<div class="page-break"></div>
+<h2>Board</h2>
+
+<div class="panel">
+  <div class="track">
+    <div class="track-label">Clock <span>one turn per box · <span class="sun">☀</span> business hours · <span class="moon">☾</span> night</span></div>
+    <div class="clock">
+      <div></div>
+      <div class="head">Night <span class="moon">☾</span><br>0–4</div>
+      <div class="head">Dawn <span class="moon">☾</span><br>4–8</div>
+      <div class="head">Morning <span class="sun">☀</span><br>8–12</div>
+      <div class="head">Afternoon <span class="sun">☀</span><br>12–16</div>
+      <div class="head">Evening<br>16–20</div>
+      <div class="head">Late <span class="moon">☾</span><br>20–24</div>
+
+      <div class="day-label">Day 1</div>
+      <div class="cell off">before start</div>
+      <div class="cell off">before start</div>
+      <div class="cell day">1<small>start</small></div>
+      <div class="cell day">2</div>
+      <div class="cell">3</div>
+      <div class="cell night">4</div>
+
+      <div class="day-label">Day 2</div>
+      <div class="cell night">5</div>
+      <div class="cell night">6</div>
+      <div class="cell day">7</div>
+      <div class="cell day">8</div>
+      <div class="cell">9</div>
+      <div class="cell night">10</div>
+
+      <div class="day-label">Day 3</div>
+      <div class="cell night">11</div>
+      <div class="cell night">12</div>
+      <div class="cell day">13</div>
+      <div class="cell day">14</div>
+      <div class="cell">15</div>
+      <div class="cell night last">16<small>last</small></div>
+    </div>
+  </div>
+
+  <div class="track">
+    <div class="track-label">Target Alert <span>Normal · Elevated · Investigating · Incident response · Lockdown</span></div>
+    <div class="boxes">
+      <div class="box">0</div><div class="box">1</div><div class="box">2</div>
+      <div class="box lvl-elev">3</div><div class="box lvl-elev">4</div><div class="box lvl-elev">5</div>
+      <div class="box lvl-inv">6</div><div class="box lvl-inv">7</div><div class="box lvl-inv">8</div>
+      <div class="box lvl-ir">9</div><div class="box lvl-ir">10</div><div class="box lvl-ir">11</div>
+      <div class="box end">12</div>
+    </div>
+  </div>
+
+  <div class="track">
+    <div class="track-label">Heat <span>10 = raid</span></div>
+    <div class="boxes">
+      <div class="box">0</div><div class="box">1</div><div class="box">2</div><div class="box">3</div><div class="box">4</div>
+      <div class="box">5</div><div class="box">6</div><div class="box">7</div><div class="box">8</div><div class="box">9</div>
+      <div class="box end">10</div>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="track">
+      <div class="track-label">Trail</div>
+      <div class="boxes">
+        <div class="box">0</div><div class="box">1</div><div class="box">2</div><div class="box">3</div><div class="box">4</div><div class="box">5</div>
+        <div class="box">6</div><div class="box">7</div><div class="box">8</div><div class="box">9</div><div class="box">10</div><div class="box">11</div><div class="box">12</div>
+      </div>
+    </div>
+    <div class="track">
+      <div class="track-label">Intel</div>
+      <div class="boxes">
+        <div class="box">0</div><div class="box">1</div><div class="box">2</div><div class="box">3</div><div class="box">4</div><div class="box">5</div>
+        <div class="box">6</div><div class="box">7</div><div class="box">8</div><div class="box">9</div><div class="box">10</div>
+      </div>
+    </div>
+  </div>
+
+  <h3>Slots</h3>
+  <div class="slots">
+    <div class="slot">Laptop 1<br>operation / hours left</div>
+    <div class="slot">Laptop 2<br>operation / hours left</div>
+    <div class="slot">Laptop 3 (Burner laptop only)<br>operation / hours left</div>
+    <div class="slot">Body<br>operation or Travel / hours left</div>
+  </div>
+
+  <div class="grid2" style="margin-top:14px">
+    <div>
+      <h3>Keys</h3>
+      <div class="checks">
+        <label><span class="cb"></span>Foothold</label>
+        <label><span class="cb"></span>Implant</label>
+        <label><span class="cb"></span>Admin credentials</label>
+        <label><span class="cb"></span>Route</label>
+        <label><span class="cb"></span>MFA bypass</label>
+      </div>
+      <h3>Revealed</h3>
+      <div class="checks">
+        <label><span class="cb"></span>Employees</label>
+        <label><span class="cb"></span>VPN gateway</label>
+        <label><span class="cb"></span>Guest Wi-Fi</label>
+        <label><span class="cb"></span>Lobby</label>
+      </div>
+    </div>
+    <div>
+      <h3>You are at</h3>
+      <div class="checks">
+        <label><span class="cb"></span>Desk</label>
+        <label><span class="cb"></span>Café</label>
+        <label><span class="cb"></span>HQ</label>
+      </div>
+      <h3>Cash</h3>
+      <p>Start $1,000 · now: <span class="write"></span></p>
+      <h3>Gear owned</h3>
+      <p><span class="write" style="min-width:260px"></span></p>
+    </div>
+  </div>
+</div>
+
+<h2>Maps</h2>
+<div class="grid2">
+  <div class="panel">
+    <h3 style="margin-top:0">Network: Corrigan Freight</h3>
+    <div class="map">
+      <div class="layer"><div class="layer-name">Perimeter</div>
+        <div class="nodes">
+          <span class="node">Website</span><span class="node">Staff email</span>
+          <span class="node hidden">VPN gateway</span><span class="node hidden">Guest Wi-Fi</span>
+        </div>
+      </div>
+      <div class="arrow">↓ Foothold</div>
+      <div class="layer"><div class="layer-name">Internal</div>
+        <div class="nodes"><span class="node hidden">Workstations</span><span class="node hidden">Domain controller</span></div>
+      </div>
+      <div class="arrow">↓ Admin credentials + Route</div>
+      <div class="layer"><div class="layer-name">Billing segment</div>
+        <div class="nodes"><span class="node hidden">Billing server</span></div>
+      </div>
+      <div class="arrow">↓ MFA bypass</div>
+      <div class="layer"><div class="layer-name">Objective</div>
+        <div class="nodes"><span class="node goal">Client ledger</span></div>
+      </div>
+    </div>
+    <p class="note">Dashed nodes are hidden until an operation reveals them or you gain the key that leads there.</p>
+  </div>
+  <div class="panel">
+    <h3 style="margin-top:0">City</h3>
+    <div class="city">
+      <span class="node">Desk (hideout)</span>
+      <span class="arrow">— 4 hours —</span>
+      <span class="node">Café (public Wi-Fi)</span>
+      <span class="arrow">— free walk —</span>
+      <span class="node">HQ</span>
+    </div>
+    <p>HQ has a <b>lobby</b>, a <b>parking lot</b>, a <b>loading dock</b> and a <b>server room</b>. The Café is next door and employees buy coffee there.</p>
+    <p class="note">You can run Laptop operations from the Desk or the Café, but not from HQ. Travel uses your Body slot for the whole turn.</p>
+  </div>
+</div>
+
+<div class="page-break"></div>
+<h2>Operation cards</h2>
+<div class="legend no-print">
+  <span><i style="background:var(--digital)"></i>Digital</span>
+  <span><i style="background:var(--physical)"></i>Physical</span>
+  <span><i style="background:var(--social)"></i>Social</span>
+  <span><i style="background:var(--money)"></i>Money</span>
+  <span><i style="background:var(--final)"></i>Final</span>
+</div>
+<p class="note">Times are in hours: 4 h is one turn. "Silent" means no Noise, Trail or Heat.</p>
+
+<div class="cards">
+
+  <!-- Recon -->
+  <div class="card social">
+    <div class="card-head"><span>Recon</span><span class="badge">Social · Laptop</span></div>
+    <h4>OSINT Sweep</h4>
+    <p class="what">Open-source intelligence: reading the company's website, job ads and staff profiles to learn who works there and how they write.</p>
+    <dl><dt>Needs</dt><dd>—</dd><dt>Takes</dt><dd>4 h</dd><dt>Cost</dt><dd>—</dd><dt>Chance</dt><dd>100%</dd></dl>
+    <p class="out ok"><span class="mark">✓</span> +2 Intel. Reveal Employees. Silent.</p>
+  </div>
+
+  <div class="card digital">
+    <div class="card-head"><span>Recon</span><span class="badge">Digital · Laptop</span></div>
+    <h4>Perimeter Scan</h4>
+    <p class="what">Checking which of the company's internet-facing systems answer, like walking around a building to see which doors exist.</p>
+    <dl><dt>Needs</dt><dd>—</dd><dt>Takes</dt><dd>4 h</dd><dt>Cost</dt><dd>—</dd><dt>Chance</dt><dd>90%</dd></dl>
+    <p class="out ok"><span class="mark">✓</span> +1 Intel. Reveal VPN gateway. Noise 1, Trail 1.</p>
+    <p class="out bad"><span class="mark">✗</span> Noise 1, Trail 1.</p>
+  </div>
+
+  <div class="card physical">
+    <div class="card-head"><span>Recon</span><span class="badge">Physical · Body</span></div>
+    <h4>Wardrive the Block</h4>
+    <p class="what">Walking around HQ with a laptop to list the wireless networks the building broadcasts.</p>
+    <dl><dt>Needs</dt><dd>At Café or HQ</dd><dt>Takes</dt><dd>4 h</dd><dt>Cost</dt><dd>—</dd><dt>Chance</dt><dd>90%</dd></dl>
+    <p class="out ok"><span class="mark">✓</span> +1 Intel. Reveal Guest Wi-Fi. Silent.</p>
+    <p class="out bad"><span class="mark">✗</span> Nothing found. Silent.</p>
+  </div>
+
+  <div class="card physical">
+    <div class="card-head"><span>Recon</span><span class="badge">Physical · Body</span></div>
+    <h4>Stake Out the Lobby</h4>
+    <p class="what">Watching the front entrance: what the badges look like, when guards change shifts, which doors get propped open.</p>
+    <dl><dt>Needs</dt><dd>At HQ · <span class="sun">☀</span></dd><dt>Takes</dt><dd>8 h</dd><dt>Cost</dt><dd>—</dd><dt>Chance</dt><dd>80% (+20% Hi-vis vest)</dd></dl>
+    <p class="out ok"><span class="mark">✓</span> +1 Intel. Reveal Lobby. Silent.</p>
+    <p class="out bad"><span class="mark">✗</span> A guard remembers your face: Heat +1.</p>
+  </div>
+
+  <div class="card physical">
+    <div class="card-head"><span>Recon</span><span class="badge">Physical · Body</span></div>
+    <h4>Dumpster Dive</h4>
+    <p class="what">Going through the company's trash for printouts, org charts and passwords written on sticky notes.</p>
+    <dl><dt>Needs</dt><dd>At HQ · <span class="moon">☾</span></dd><dt>Takes</dt><dd>4 h</dd><dt>Cost</dt><dd>—</dd><dt>Chance</dt><dd>60%</dd></dl>
+    <p class="out ok"><span class="mark">✓</span> +3 Intel. Silent.</p>
+    <p class="out bad"><span class="mark">✗</span> Someone sees you: Heat +2.</p>
+  </div>
+
+  <!-- Foothold -->
+  <div class="card social">
+    <div class="card-head"><span>Foothold</span><span class="badge">Social · Laptop</span></div>
+    <h4>Spear-Phish</h4>
+    <p class="what">A tailored email that seems to come from someone the employee trusts, leading to a fake sign-in page that captures their login.</p>
+    <dl><dt>Needs</dt><dd>Employees · Lookalike domain · <span class="sun">☀</span></dd><dt>Takes</dt><dd>8 h</dd><dt>Cost</dt><dd>—</dd><dt>Chance</dt><dd>40%</dd></dl>
+    <p class="out ok"><span class="mark">✓</span> Foothold. Noise 1, Trail 1.</p>
+    <p class="out bad"><span class="mark">✗</span> Someone reports it: Noise 2, Trail 1.</p>
+  </div>
+
+  <div class="card digital">
+    <div class="card-head"><span>Foothold</span><span class="badge">Digital · Laptop</span></div>
+    <h4>Exploit the VPN</h4>
+    <p class="what">The VPN is the gateway staff use to work from home. If its software has a publicly known flaw they haven't patched, you can slip through it.</p>
+    <dl><dt>Needs</dt><dd>VPN gateway, not patched</dd><dt>Takes</dt><dd>4 h</dd><dt>Cost</dt><dd>$300</dd><dt>Chance</dt><dd>30% (+20% Known exploit)</dd></dl>
+    <p class="out ok"><span class="mark">✓</span> Foothold. Noise 1, Trail 1.</p>
+    <p class="out bad"><span class="mark">✗</span> It crashes and alarms go off: Noise 3, Trail 1.</p>
+  </div>
+
+  <div class="card social">
+    <div class="card-head"><span>Foothold</span><span class="badge">Social · Laptop</span></div>
+    <h4>Helpdesk Pretext Call</h4>
+    <p class="what">Calling the IT helpdesk as a "locked-out employee" and talking them into resetting access for you.</p>
+    <dl><dt>Needs</dt><dd>Employees · <span class="sun">☀</span></dd><dt>Takes</dt><dd>4 h</dd><dt>Cost</dt><dd>—</dd><dt>Chance</dt><dd>30% (+20% Caller-ID spoofer)</dd></dl>
+    <p class="out ok"><span class="mark">✓</span> Foothold, and +10% on MFA Push Fatigue. Silent.</p>
+    <p class="out bad"><span class="mark">✗</span> They get suspicious: Noise 2, Heat +1.</p>
+  </div>
+
+  <div class="card physical">
+    <div class="card-head"><span>Foothold</span><span class="badge">Physical · Body</span></div>
+    <h4>Evil-Twin Wi-Fi</h4>
+    <p class="what">Running a fake copy of the company's guest Wi-Fi nearby, so staff devices connect to you instead of the real one.</p>
+    <dl><dt>Needs</dt><dd>At Café · Guest Wi-Fi · Rogue AP kit · <span class="sun">☀</span></dd><dt>Takes</dt><dd>8 h</dd><dt>Cost</dt><dd>—</dd><dt>Chance</dt><dd>50%</dd></dl>
+    <p class="out ok"><span class="mark">✓</span> Foothold. Silent.</p>
+    <p class="out bad"><span class="mark">✗</span> Noise 1.</p>
+  </div>
+
+  <div class="card physical">
+    <div class="card-head"><span>Foothold</span><span class="badge">Physical · Body</span></div>
+    <h4>Tailgate and Plant</h4>
+    <p class="what">Following an employee through a secure door, then hiding a small network device somewhere inside the building.</p>
+    <dl><dt>Needs</dt><dd>At HQ · Lobby · Network implant · <span class="sun">☀</span></dd><dt>Takes</dt><dd>4 h</dd><dt>Cost</dt><dd>—</dd><dt>Chance</dt><dd>40% (+20% Badge cloner, +20% Hi-vis vest)</dd></dl>
+    <p class="out ok"><span class="mark">✓</span> Foothold and Implant. Silent.</p>
+    <p class="out bad"><span class="mark">✗</span> Security escorts you out: Noise 3, Heat +2.</p>
+    <p class="note" style="margin:4px 0 0">The Network implant is used up either way.</p>
+  </div>
+
+  <div class="card money">
+    <div class="card-head"><span>Foothold</span><span class="badge">Money · Laptop</span></div>
+    <h4>Buy Access</h4>
+    <p class="what">Paying a criminal "access broker" who already has a way into the company and sells it to the highest bidder.</p>
+    <dl><dt>Needs</dt><dd>—</dd><dt>Takes</dt><dd>4 h</dd><dt>Cost</dt><dd>$1,500</dd><dt>Chance</dt><dd>100%</dd></dl>
+    <p class="out ok"><span class="mark">✓</span> Foothold. Silent.</p>
+  </div>
+
+  <!-- Admin credentials -->
+  <div class="card digital">
+    <div class="card-head"><span>Admin credentials</span><span class="badge">Digital · Laptop</span></div>
+    <h4>Crack Password Hashes</h4>
+    <p class="what">Systems store passwords scrambled ("hashed"). Guessing huge numbers of passwords against the scrambled copies eventually finds the weak ones.</p>
+    <dl><dt>Needs</dt><dd>Foothold</dd><dt>Takes</dt><dd>12 h (8 h with GPU rig)</dd><dt>Cost</dt><dd>—</dd><dt>Chance</dt><dd>70%</dd></dl>
+    <p class="out ok"><span class="mark">✓</span> Admin credentials. Noise 1, Trail 1.</p>
+    <p class="out bad"><span class="mark">✗</span> Noise 1, Trail 1.</p>
+  </div>
+
+  <div class="card digital">
+    <div class="card-head"><span>Admin credentials</span><span class="badge">Digital · Laptop</span></div>
+    <h4>Abuse a Misconfiguration</h4>
+    <p class="what">Finding a setting someone got wrong, like a service account with far more power than it needs, and using it to make yourself an admin.</p>
+    <dl><dt>Needs</dt><dd>Foothold · spend at least 2 Intel on the roll</dd><dt>Takes</dt><dd>4 h</dd><dt>Cost</dt><dd>—</dd><dt>Chance</dt><dd>30% + Intel</dd></dl>
+    <p class="out ok"><span class="mark">✓</span> Admin credentials. Noise 1, Trail 1.</p>
+    <p class="out bad"><span class="mark">✗</span> Noise 3, Trail 1.</p>
+  </div>
+
+  <!-- Route -->
+  <div class="card digital">
+    <div class="card-head"><span>Route</span><span class="badge">Digital · Laptop</span></div>
+    <h4>Pivot to Billing</h4>
+    <p class="what">Using admin access to hop from the office network into the separate, better-protected billing network.</p>
+    <dl><dt>Needs</dt><dd>Admin credentials</dd><dt>Takes</dt><dd>8 h</dd><dt>Cost</dt><dd>—</dd><dt>Chance</dt><dd>60%</dd></dl>
+    <p class="out ok"><span class="mark">✓</span> Route. Noise 2, Trail 1.</p>
+    <p class="out bad"><span class="mark">✗</span> Their security tools flag it: Noise 3, Trail 1.</p>
+  </div>
+
+  <div class="card physical">
+    <div class="card-head"><span>Route</span><span class="badge">Physical · Body</span></div>
+    <h4>Server Room After Hours</h4>
+    <p class="what">Getting into the server room at night and plugging straight into the billing network, skipping the digital walls.</p>
+    <dl><dt>Needs</dt><dd>At HQ · Lobby · Badge cloner or Lock picks · <span class="moon">☾</span></dd><dt>Takes</dt><dd>4 h</dd><dt>Cost</dt><dd>—</dd><dt>Chance</dt><dd>50% (+20% with both)</dd></dl>
+    <p class="out ok"><span class="mark">✓</span> Route. Silent.</p>
+    <p class="out bad"><span class="mark">✗</span> A guard catches you: Noise 2, Heat +3.</p>
+  </div>
+
+  <!-- MFA -->
+  <div class="card social">
+    <div class="card-head"><span>MFA bypass</span><span class="badge">Social · Laptop</span></div>
+    <h4>MFA Push Fatigue</h4>
+    <p class="what">Sending sign-in approval prompts to an employee's phone over and over, until they tap "Approve" just to make it stop.</p>
+    <dl><dt>Needs</dt><dd>Admin credentials · <span class="sun">☀</span></dd><dt>Takes</dt><dd>4 h</dd><dt>Cost</dt><dd>—</dd><dt>Chance</dt><dd>50% (+10% Caller-ID spoofer)</dd></dl>
+    <p class="out ok"><span class="mark">✓</span> MFA bypass. Noise 1.</p>
+    <p class="out bad"><span class="mark">✗</span> They report the prompts: Noise 2.</p>
+  </div>
+
+  <div class="card digital">
+    <div class="card-head"><span>MFA bypass</span><span class="badge">Digital · Laptop</span></div>
+    <h4>Steal Session Token</h4>
+    <p class="what">Copying the "already signed in" token from a logged-in machine, so you never face the second login step at all.</p>
+    <dl><dt>Needs</dt><dd>Foothold</dd><dt>Takes</dt><dd>8 h</dd><dt>Cost</dt><dd>—</dd><dt>Chance</dt><dd>40% (+20% with Implant)</dd></dl>
+    <p class="out ok"><span class="mark">✓</span> MFA bypass. Noise 1, Trail 1.</p>
+    <p class="out bad"><span class="mark">✗</span> Noise 2, Trail 1.</p>
+  </div>
+
+  <!-- Final -->
+  <div class="card final">
+    <div class="card-head"><span>Final operation</span><span class="badge">Digital · Laptop</span></div>
+    <h4>Exfiltrate the Ledger</h4>
+    <p class="what">Copying the ledger out of the company without their data-loss alarms catching the transfer.</p>
+    <dl><dt>Needs</dt><dd>Foothold · Admin credentials · Route · MFA bypass</dd><dt>Takes</dt><dd>8 h</dd><dt>Cost</dt><dd>—</dd><dt>Chance</dt><dd>80%</dd></dl>
+    <p class="out ok"><span class="mark">✓</span> Contract complete: +$3,000. It ends at once, so its Noise doesn't count.</p>
+    <p class="out bad"><span class="mark">✗</span> The alarm trips mid-copy: Noise 4, Trail 2.</p>
+  </div>
+
+  <!-- Money and cleanup -->
+  <div class="card money">
+    <div class="card-head"><span>Income</span><span class="badge">Money · Laptop</span></div>
+    <h4>Bug Bounty</h4>
+    <p class="what">Legal side work: reporting a security flaw to an unrelated company that pays researchers for finding them.</p>
+    <dl><dt>Needs</dt><dd>—</dd><dt>Takes</dt><dd>12 h</dd><dt>Cost</dt><dd>—</dd><dt>Chance</dt><dd>70%</dd></dl>
+    <p class="out ok"><span class="mark">✓</span> +$600. Silent.</p>
+    <p class="out bad"><span class="mark">✗</span> No payout. Silent.</p>
+  </div>
+
+  <div class="card money">
+    <div class="card-head"><span>Income</span><span class="badge">Money · Laptop</span></div>
+    <h4>Sell Scraped Data</h4>
+    <p class="what">Selling data you copied from inside the company. Quick money, but it gets noticed and points back at you.</p>
+    <dl><dt>Needs</dt><dd>Foothold · at most twice per contract</dd><dt>Takes</dt><dd>4 h</dd><dt>Cost</dt><dd>—</dd><dt>Chance</dt><dd>90%</dd></dl>
+    <p class="out ok"><span class="mark">✓</span> +$800. Noise 1, Trail 1, Heat +1.</p>
+    <p class="out bad"><span class="mark">✗</span> No sale. Noise 1, Trail 1, Heat +1.</p>
+  </div>
+
+  <div class="card digital">
+    <div class="card-head"><span>Cleanup</span><span class="badge">Digital · Laptop</span></div>
+    <h4>Wipe Logs</h4>
+    <p class="what">Deleting the records that show what you did. If it goes wrong, the deletion itself looks suspicious.</p>
+    <dl><dt>Needs</dt><dd>Foothold</dd><dt>Takes</dt><dd>4 h</dd><dt>Cost</dt><dd>—</dd><dt>Chance</dt><dd>80%</dd></dl>
+    <p class="out ok"><span class="mark">✓</span> Remove up to 3 Trail. Silent.</p>
+    <p class="out bad"><span class="mark">✗</span> Noise 1.</p>
+  </div>
+
+</div>
+
+<h2>Shop</h2>
+<p>Buy during the "Shop and move" step. Gear lasts the whole contract unless it says otherwise. Planning what to buy, and when, is part of the job.</p>
+<table>
+  <tr><th>Gear</th><th style="width:80px">Cost</th><th>What it is</th><th>Effect</th></tr>
+  <tr><td>Lookalike domain</td><td>$200</td><td>A web address one letter off from Corrigan's, for convincing emails.</td><td>Needed for Spear-Phish.</td></tr>
+  <tr><td>Caller-ID spoofer</td><td>$250</td><td>Makes your calls show up as an internal company number.</td><td>+20% on Helpdesk Pretext Call. +10% on MFA Push Fatigue.</td></tr>
+  <tr><td>Hi-vis vest and clipboard</td><td>$150</td><td>People rarely question someone who looks like a contractor.</td><td>+20% on Stake Out the Lobby and on Tailgate and Plant.</td></tr>
+  <tr><td>Rogue AP kit</td><td>$400</td><td>A portable wireless access point.</td><td>Needed for Evil-Twin Wi-Fi.</td></tr>
+  <tr><td>Network implant</td><td>$500</td><td>A small device that, once hidden inside, gives you remote access.</td><td>Needed for Tailgate and Plant. Used up when that operation resolves.</td></tr>
+  <tr><td>Badge cloner</td><td>$300</td><td>Copies an access badge's signal from a short distance.</td><td>+20% on Tailgate and Plant. Opens Server Room After Hours.</td></tr>
+  <tr><td>Lock picks</td><td>$150</td><td>The old-fashioned way through a door.</td><td>Opens Server Room After Hours.</td></tr>
+  <tr><td>Known exploit</td><td>$400</td><td>Ready-made attack code for a publicly known flaw.</td><td>+20% on Exploit the VPN.</td></tr>
+  <tr><td>GPU rig</td><td>$600</td><td>Graphics cards are very fast at guessing passwords.</td><td>Crack Password Hashes takes 8 h instead of 12 h.</td></tr>
+  <tr><td>Burner laptop</td><td>$700</td><td>A second machine you can afford to lose.</td><td>+1 Laptop slot.</td></tr>
+  <tr><td>Proxy chain</td><td>$300</td><td>Routes your traffic through several countries.</td><td>Trace adds 1 less Heat each turn (minimum 0).</td></tr>
+  <tr><td>Lawyer on retainer</td><td>$800</td><td>Someone to call when the police knock.</td><td>The first raid doesn't end the contract: Heat drops to 6 and you lose all other gear.</td></tr>
+</table>
+
+<h2>Optional variant: the rival</h2>
+<p>Once the solo game makes sense, add a rival racing for the same ledger:</p>
+<ul>
+  <li>Track the rival on a separate line: <b>Foothold → Admin credentials → Route → MFA bypass → Exfiltrated</b>.</li>
+  <li>At the end of turns 3, 6, 9, 12 and 15 (Day 1 Evening, Day 2 Dawn, Day 2 Evening, Day 3 Dawn, Day 3 Evening), the rival advances one step and adds <b>+1 Target Alert</b>.</li>
+  <li>If the rival reaches "Exfiltrated" first, you lose.</li>
+  <li><b>Close the door:</b> after you gain Admin credentials, use a Laptop slot for 4 hours (Noise 1) to delay the rival's next advance by 3 turns. Usable once.</li>
+</ul>
+
+<div class="page-break"></div>
+<h2>Playtest log</h2>
+<table>
+  <tr><th>#</th><th>Result</th><th>Turns used</th><th>Cash left</th><th>Heat</th><th>Alert</th><th>Keys: how you got each</th><th>Notes</th></tr>
+  <tr><td>1</td><td></td><td></td><td></td><td></td><td></td><td style="height:48px"></td><td></td></tr>
+  <tr><td>2</td><td></td><td></td><td></td><td></td><td></td><td style="height:48px"></td><td></td></tr>
+  <tr><td>3</td><td></td><td></td><td></td><td></td><td></td><td style="height:48px"></td><td></td></tr>
+  <tr><td>4</td><td></td><td></td><td></td><td></td><td></td><td style="height:48px"></td><td></td></tr>
+  <tr><td>5</td><td></td><td></td><td></td><td></td><td></td><td style="height:48px"></td><td></td></tr>
+</table>
+
+<h3>Questions to answer after each session</h3>
+<ol>
+  <li>Did you face real decisions most turns, or were there obvious best moves?</li>
+  <li>Did you understand what each action does? Did the "what it is" lines help?</li>
+  <li>Did the parts of the day make sense? Did you know when to do what?</li>
+  <li>Were there turns where you had nothing useful to start?</li>
+  <li>Did running operations side by side feel good, or like bookkeeping?</li>
+  <li>Did Target Alert and Heat change how you played? When did you lie low, and did it help you recover?</li>
+  <li>Did you use physical operations? Were they worth the travel and the risk?</li>
+  <li>Did you buy gear ahead of time and plan around it? Did money matter?</li>
+  <li>Which card did you never play, and why? Which did you always play?</li>
+  <li>How did the ending feel: a tense finish, or a formality?</li>
+  <li>How long did a contract take?</li>
+</ol>
+
+<h3>Tuning knobs</h3>
+<p class="note">Change one thing at a time between sessions and note it in the log: success chances (±10%), Noise values, the Alert thresholds, how much Alert drops in a quiet turn (now 2), starting cash, the deadline (16 turns), Hunt odds, and gear prices.</p>
+
+</main>
+</body>
+</html>

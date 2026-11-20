@@ -202,6 +202,13 @@ Trail   Phishing domain, mail-server logs
 
 Success chance comes from: intel on the target, tool tier, skill branches, target defenses, Target Alert and time of day. Failed operations usually make more noise than successful ones.
 
+Every operation also shows, before the player commits:
+
+- **What it is:** one plain-language line on what the action is in the real world, at the level of a news article and never step-by-step instructions.
+- **Both outcomes:** what success gives and what failure costs (Noise, Trail, Heat).
+
+The first paper playtest showed players can't make good decisions without both: the actions felt like real choices, but their meaning and their failure costs weren't clear.
+
 ## 10. Two maps
 
 ### Network map (digital)
@@ -278,6 +285,7 @@ The darknet market has tiers unlocked by reputation, limited stock and rotating 
 
 ### The in-game clock
 
+- The clock reads as **parts of the day** (Night, Dawn, Morning, Afternoon, Evening, Late), and the interface shows what each part opens up, so players can plan when to act. Abstract time units confused the first paper playtest.
 - Phishing needs employees at work; physical entry is easier at night but guards still patrol.
 - Defenders are short-staffed on nights and weekends.
 - Seeded events vary each side contract: a patch day closes known holes, layoffs create a disgruntled insider, a holiday leaves a skeleton crew, an outside audit raises detection, a vendor is breached in the news.
