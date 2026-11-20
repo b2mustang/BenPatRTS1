@@ -15,6 +15,8 @@ Gaps in the v0.1 rules, decided at the table. Fold them into v0.2.
 7. **Keys don't stack.** Succeeding at an operation for a key you already hold gives nothing, though Noise and Trail still apply. During "Start operations" you may cancel a running operation: no refund, no Noise, and its slot frees up.
 8. **A running Body operation keeps you at its location** (added in block 9). You can't walk away until it resolves, so you can't start Laptop operations from HQ while staking out the lobby. Claude first offered a walk to the Café mid-stakeout, then corrected it before rolling.
 9. **A successful Exfiltrate ends the contract at once.** Its Noise can't trigger a Lockdown.
+10. **Losing a key cancels running operations that need it** (proposed after session 2; used by the simulation). v0.2 only says this for the Foothold after a Hunt, not for Admin credentials and MFA bypass after a credential reset.
+11. **One Bug Bounty at a time** (proposed after the simulation; used by it). v0.2 sets no limit, so a player could run it in both Laptop slots and repeat it for $600 every 12 hours.
 
 ## Session 1: Corrigan Freight (solo)
 
@@ -66,6 +68,16 @@ Start: D1 Morning, at the Desk. Cash $1,000. Intel 0, Heat 0, Alert 0, Trail 0. 
 8. **The ending?** Tense.
 9. **Anything else?** The blocks weren't clear. Play should be framed as parts of a day, so the player understands when an action is best to run.
 
+### Tuning candidates after session 1
+
+Change one thing at a time. A was chosen for v0.2.
+
+- **A. Alert falls by 2, not 1, in a block with no Noise.** Makes lying low a real recovery tool. (Claude's first pick: the spiral decided this session.)
+- **B. Exfiltrate failure Noise 4 → 2.** Softens the single roll that decided the game.
+- **C. Wipe Logs also lowers Alert by 1 on success.** Gives a tool for climbing down from high Alert.
+- **D. Give the Body slot work in the Evening and after recon**, for example a repeatable "Watch the building" for +1 Intel.
+- **E. Make money matter:** start with $600, or make the shop items more central to the routes.
+
 ### Takeaways for v0.2
 
 - **Explain every action.** Each card gets one plain-language line on what the action is in the real world, at the level of a news article, never instructions. Physical actions were easier to grasp because they're concrete; digital and social ones need the same concreteness.
@@ -86,12 +98,89 @@ Start: D1 Morning, at the Desk. Cash $1,000. Intel 0, Heat 0, Alert 0, Trail 0. 
 
 The gear changes affect balance too, so session 2 tests two balance changes at once: the Alert drop and the gear. If it plays very differently, those are the two suspects. Not changed yet: the idle Body slot in the Evening and after recon, starting cash, and Exfiltrate's failure Noise.
 
-### Tuning candidates for session 2
+## Session 2: Corrigan Freight (solo, v0.2, Claude plays)
 
-Change one thing at a time.
+Claude played this one to test balance and rules, not clarity: Claude wrote the rules, so it can't judge whether they're easy to understand. Strategy: a quiet social route with gear, lying low to bring Alert down before the key rolls. Dice rolled in the shell, one call per turn, after the turn's decisions.
 
-- **A. Alert falls by 2, not 1, in a block with no Noise.** Makes lying low a real recovery tool. (Claude's first pick: the spiral decided this session.)
-- **B. Exfiltrate failure Noise 4 → 2.** Softens the single roll that decided the game.
-- **C. Wipe Logs also lowers Alert by 1 on success.** Gives a tool for climbing down from high Alert.
-- **D. Give the Body slot work in the Evening and after recon**, for example a repeatable "Watch the building" for +1 Intel.
-- **E. Make money matter:** start with $600, or make the shop items more central to the routes.
+| Turn | Shop and move | Started | Resolved (roll) | After: Cash · Intel · Alert · Heat · Trail · Keys |
+|---|---|---|---|---|
+| 1 · D1 Morning ☀ · Desk | Caller-ID spoofer ($250). Travel to Café | OSINT Sweep, Bug Bounty (12 h) | OSINT ✓ (100%): Employees revealed | $750 · 2 · 0 · 0 · 0 · none |
+| 2 · D1 Afternoon ☀ · Café | none | Helpdesk Pretext Call, Wardrive the Block | Wardrive ✓ (5 vs ≤9): +1 Intel, Guest Wi-Fi. Helpdesk ✓ at 80% (50% with spoofer + 3 Intel; 8 vs ≤8): **Foothold** | $750 · 0 · 0 · 0 · 0 · Foothold |
+| 3 · D1 Evening · Café | none | Crack Password Hashes (12 h) | Bug Bounty ✗ (10 vs ≤7) | $750 · 0 · 0 · 0 · 0 · Foothold |
+| 4 · D1 Late ☾ · Café → HQ | Walk to HQ | Dumpster Dive | Dumpster Dive ✗ (8 vs ≤6): Heat +2 | $750 · 0 · 0 · 2 · 0 · Foothold |
+| 5 · D2 Night ☾ · HQ | none | Dumpster Dive (retry) | Dumpster Dive ✓ (3 vs ≤6): +3 Intel. Crack ✗ at 70%, no Intel spent (9 vs ≤7): Noise 1, Trail 1 | $750 · 3 · 1 · 2 · 1 · Foothold |
+| 6 · D2 Dawn ☾ · HQ → Café | GPU rig ($600). Walk to Café | Crack Password Hashes (8 h with the GPU rig) | Nothing resolves. Quiet, so Alert −2 | $150 · 3 · 0 · 2 · 1 · Foothold |
+| 7 · D2 Morning ☀ · Café | none | none | Crack ✓ at 80% with 1 Intel (7 vs ≤8): **Admin credentials**. Noise 1, Trail 1 | $150 · 2 · 1 · 2 · 2 · Foothold, Admin |
+| 8 · D2 Afternoon ☀ · Café | none | MFA Push Fatigue, Pivot to Billing (8 h) | MFA Push ✗ at 70% (9 vs ≤7): Noise 2 | $150 · 2 · 3 · 2 · 2 · Foothold, Admin |
+| 9 · D2 Evening · Café | none | Wipe Logs (resolved before Pivot) | Wipe Logs ✓ at 70% (3 vs ≤7): Trail 2 → 0. Pivot ✓ at 70% (60% − 10% Elevated + 2 Intel; 1 vs ≤7): **Route**. Noise 2, Trail 1 | $150 · 0 · 5 · 2 · 1 · Foothold, Admin, Route |
+| 10–12 · D2 Late to D3 Dawn | none | none: lie low until business hours | Three quiet turns: Alert 5 → 3 → 1 → 0 | $150 · 0 · 0 · 2 · 1 · Foothold, Admin, Route |
+| 13 · D3 Morning ☀ · Café | none | MFA Push Fatigue | MFA Push ✓ at 70% (2 vs ≤7): **MFA bypass**. Noise 1 | $150 · 0 · 1 · 2 · 1 · all four keys |
+| 14 · D3 Afternoon ☀ · Café → HQ | Hi-vis vest ($150). Walk to HQ after starting Exfiltrate | Exfiltrate the Ledger, Stake Out the Lobby (100% with the vest) | Nothing resolves. Quiet, so Alert −2 | $0 · 0 · 0 · 2 · 1 · all four keys |
+| 15 · D3 Evening · HQ | none | none | Stake Out ✓ (100%): +1 Intel. **Exfiltrate ✓** at 90% with 1 Intel (5 vs ≤9): **contract complete** | $3,000 · 0 · 0 · 2 · 1 · won |
+
+### Result
+
+| # | Result | Turns used | Cash left | Heat | Alert | Keys: how you got each | Notes |
+|---|---|---|---|---|---|---|---|
+| 2 | **Won** | 15 of 16 | $0, then +$3,000 | 2 | 0 | Foothold: Helpdesk Pretext Call (spoofer + 3 Intel). Admin: Crack Password Hashes (second try, GPU rig, 1 Intel). Route: Pivot to Billing (2 Intel, after Wipe Logs). MFA bypass: MFA Push Fatigue (second try, after lying low) | Three quiet turns before the last keys; Alert never passed 5 |
+
+### What Claude saw
+
+1. **Lying low works now.** Three quiet turns took Alert from 5 to 0, so MFA Push and Exfiltrate rolled at full strength. Before deciding, Claude estimated about 73% to win by waiting against about 66% by pushing on with Steal Session Token. With v0.1's drop of 1, Alert would only have reached 2 by turn 13.
+2. **It also creates dead turns.** Turns 10–12 had no decisions at all. In the real-time game that's fast-forward; on paper it's dull.
+3. **Money mattered this time.** All $1,000 went on the spoofer, the GPU rig and the vest; the vest used the last $150 to lift the final roll from 80% to 90%. The failed Bug Bounty limited the options. This supports "money as preparation".
+4. **Careful play uses few slots.** Laptop 2 sat idle in 9 of 15 turns and the Body slot in 9 of 15. Every running noisy operation threatens Alert, so only silent ones (recon, Bug Bounty, Wipe Logs, the stakeout) paired well in parallel.
+5. **Spending Intel is a real decision.** Saving Intel for Pivot left Crack at 70%, and it failed by 2; one more Intel would have passed.
+6. **Business hours are the real clock for the endgame.** MFA Push needs ☀, so the failure on turn 8 meant waiting until turn 13.
+7. **New rules gap:** losing Admin and MFA bypass to a credential reset doesn't say what happens to running operations that need them. Proposed as ruling 10.
+
+## Simulation: v0.2 balance runs
+
+[`tools/paper_prototype_sim.py`](../../tools/paper_prototype_sim.py) plays the contract 10,000 times per play style and ruleset. The seed is fixed, so `python tools/paper_prototype_sim.py` reproduces these numbers exactly; `--trace "quiet social"` prints sample games turn by turn. Traces were read to check the bots follow the rules.
+
+The bots follow scripted styles and never take a roll that could cause a Lockdown, so some of their time-outs would be last-chance gambles for a human, like the final roll of session 1. They test balance, not clarity or fun.
+
+- **Quiet social:** Caller-ID spoofer, Helpdesk call, Crack, Pivot, MFA Push; lies low before key rolls (like session 2).
+- **Balanced:** no gear up front; phone or email in, Abuse or Crack, MFA Push; moderate risk (like session 1).
+- **Fast digital:** Known exploit, the VPN, Abuse or Crack, Steal Session Token; never wipes logs; ignores Alert until Lockdown is possible.
+- **Physical:** Hi-vis vest, Network implant and Lock picks; tailgate in, Server Room for the Route.
+- **Buy access:** Bug Bounty to afford Buy Access; a phone call only if the money doesn't come.
+
+### Win rate by ruleset
+
+| Ruleset | Average | Quiet social | Balanced | Fast digital | Physical | Buy access |
+|---|---|---|---|---|---|---|
+| v0.1 | **40%** | 53% | 42% | 27% | 40% | 40% |
+| v0.2 gear, but Alert drop 1 | **47%** | 67% | 43% | 26% | 58% | 40% |
+| **v0.2** | **58%** | 73% | 58% | 45% | 59% | 53% |
+| v0.2 + Exfiltrate failure Noise 2 (candidate B) | **59%** | 73% | 60% | 46% | 62% | 54% |
+| v0.2 + Wipe Logs lowers Alert by 1 (candidate C) | **59%** | 73% | 61% | 44% | 61% | 54% |
+| v0.2 + Watch the Building, unlimited (candidate D) | **78%** | 94% | 71% | 66% | 73% | 86% |
+| v0.2 + Watch the Building, 3 uses | **65%** | 80% | 60% | 53% | 68% | 63% |
+
+"Watch the Building" is a candidate Body operation: at the Café or near HQ, any time, 4 h, certain, silent, +1 Intel.
+
+### How v0.2 contracts end
+
+| Style | Win | Raid | Time out | Avg winning turn | Credential reset | Idle Laptop slot-turns (of 32) | Idle Body turns (of 16) |
+|---|---|---|---|---|---|---|---|
+| Quiet social | 73% | 1% | 26% | 12.9 | 9% | 8.4 | 10.0 |
+| Balanced | 58% | 12% | 30% | 11.2 | 10% | 10.6 | 9.3 |
+| Fast digital | 45% | 39% | 16% | 11.2 | 33% | 8.9 | 10.2 |
+| Physical | 59% | 5% | 36% | 13.4 | 4% | 13.1 | 6.5 |
+| Buy access | 53% | 3% | 44% | 14.0 | 19% | 9.3 | 11.3 |
+
+### What the numbers say
+
+1. **v0.2 works.** The average win rate rises from 40% to 58%. The Alert drop of 2 helps the risky styles most (Fast digital 26% → 45%, Balanced 43% → 58%); the new gear helps the careful and physical ones (Quiet social 53% → 67% and Physical 40% → 58% from gear alone).
+2. **The spiral is handled.** Candidates B and C add about 1 point each: not worth the extra rules.
+3. **Time is now the main way to lose** (16–44% of contracts). Business hours gate the Helpdesk call, MFA Push, the stakeout and tailgating, so one failure there waits until the next business day.
+4. **Recklessness is punished by Heat, not Lockdown.** Fast digital loses 39% to raids: without Wipe Logs, Trail builds up and Trace turns it into Heat every turn.
+5. **Several routes are viable.** The quiet social route is strongest (73%), but physical, balanced and buy-access play all win more than half the time.
+6. **Slots sit idle:** 8–13 of 32 Laptop slot-turns and 6–11 of 16 Body turns.
+7. **Body work must not give unlimited Intel.** Unlimited Watch the Building lifts the average to 78% (Quiet social 94%). Limited to 3 uses it gives 65% and cuts idle Body turns to about 6.
+8. **Rules gap:** Bug Bounty has no limit (proposed ruling 11).
+
+### Recommendation
+
+Hold balance changes until a person plays v0.2. Win rates are in a reasonable range, and v0.2's main changes (the clock, the explanations) can only be tested by someone who didn't write them. After that playtest, v0.3 should write in rulings 10 and 11, and, if the idle Body slot still feels dull to a human, add Watch the Building with 3 uses as the one balance change.

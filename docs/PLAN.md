@@ -196,7 +196,7 @@ Current as of November 2026; confirm each figure in your Steamworks account.
 ## 10. Next steps
 
 1. Name the mission targets (`STORY.md` §11).
-2. Run the paper prototype ([`prototype/paper-prototype.html`](prototype/paper-prototype.html), now v0.2): session 1 on v0.1 is in [`prototype/playtest-log.md`](prototype/playtest-log.md). Play 2–4 more contracts on v0.2 and log them.
+2. Run the paper prototype ([`prototype/paper-prototype.html`](prototype/paper-prototype.html), now v0.2). [`prototype/playtest-log.md`](prototype/playtest-log.md) has session 1 (v0.1), session 2 (Claude playing v0.2) and a 10,000-contract simulation (`python tools/paper_prototype_sim.py`). Still needed: 1–3 contracts on v0.2 played by a person, to test whether the rules are clear.
 3. Start M1: the plain digital prototype of one side contract, built on what the paper prototype shows. (M0 is done: scaffold, tests, Godot smoke test and green CI.)
 
 ## Sources

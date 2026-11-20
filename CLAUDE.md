@@ -48,6 +48,7 @@ M0 (foundations) is in place:
 - `src/Sim.Tests`: xUnit tests, including reference outputs for both generators.
 - `game/`: the Godot project. `scenes/main.tscn` with `Main.cs` steps the sim and shows the tick; `-- --smoke-test` runs 100 ticks headless and quits with exit code 0 on success. Godot builds `game/Footprint.csproj`, which references `src/Sim`; `dotnet/project/solution_directory="../"` points the editor at the root solution.
 - `.github/workflows/ci.yml`: on every push and pull request, restore, build and test the solution on Ubuntu. It doesn't download LFS files or run Godot.
+- `docs/prototype/`: the paper prototype kit and its playtest log. `tools/paper_prototype_sim.py` is a throwaway Python balance simulation of the paper kit's rules (`python tools/paper_prototype_sim.py`, or `--trace "quiet social"` for sample games); keep it in step with the kit when the rules change.
 
 ## Build, run and test
 
